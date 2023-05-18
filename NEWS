@@ -1,4 +1,10 @@
 CHANGES:
+
+0.10.3 - 0.10.4
+- Fix tdf#153034: Three wrong Greek characters in WordPerfect 5 import
+  by partially reverting commit
+  0bacfbb3e035174308cb7dd87acfca320dda3912 from 2010
+
 0.10.2 - 0.10.3
 - Drop outdated MSVC project files.
 - Fix a couple of issues found by oss-fuzz.
