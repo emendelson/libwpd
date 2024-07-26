@@ -151,6 +151,73 @@ unsigned readU32(librevenge::RVNGInputStream *input, WPXEncryption *encryption, 
 	return (unsigned)p[0]|((unsigned)p[1]<<8)|((unsigned)p[2]<<16)|((unsigned)p[3]<<24);
 }
 
+bool isValidUtf8(librevenge::RVNGInputStream *input, WPXEncryption *encryption)
+{
+	input->seek(-1, librevenge::RVNG_SEEK_CUR);
+	long startPosition = input->tell();
+
+	unsigned char buffer[4];
+	for (int i = 0; i < 4; ++i)
+		buffer[i] = readU8(input, encryption);
+	unsigned codePoint = 0;
+	int length = 0;
+
+	// 0x00 .. 0x7F
+	if ((buffer[0] & 0x80) == 0x00)
+	{
+		codePoint = (buffer[0] & 0x7F);
+		length = 1;
+	}
+	// 0x80 .. 0x07FF
+	else if ((buffer[0] & 0xE0) == 0xC0)
+	{
+		codePoint = (buffer[0] & 0x1F);
+		length = 2;
+	}
+	// 0x0800 .. 0xFFFF
+	else if ((buffer[0] & 0xF0) == 0xE0)
+	{
+		codePoint = (buffer[0] & 0x0F);
+		length = 3;
+	}
+	// 0x10000 .. 0x10FFFF
+	else if ((buffer[0] & 0xF8) == 0xF0)
+	{
+		codePoint = (buffer[0] & 0x07);
+		length = 4;
+	}
+	// outside of the range
+	else
+	{
+		input->seek(startPosition + 1, librevenge::RVNG_SEEK_SET);
+		return false;
+	}
+
+	for (int i = 1; i < length; ++i)
+	{
+		if ((buffer[i] & 0xC0) != 0x80)
+		{
+			input->seek(startPosition + 1, librevenge::RVNG_SEEK_SET);
+			return false;
+		}
+		codePoint = (codePoint << 6) | (buffer[i] & 0x3F);
+	}
+
+	if ((codePoint > 0x10FFFF) ||
+	        ((codePoint >= 0xD800) && (codePoint <= 0xDFFF)) ||
+	        ((codePoint <= 0x007F) && (length != 1)) ||
+	        ((codePoint >= 0x0080) && (codePoint <= 0x07FF) && (length != 2)) ||
+	        ((codePoint >= 0x0800) && (codePoint <= 0xFFFF) && (length != 3)) ||
+	        ((codePoint >= 0x10000) && (codePoint <= 0x1FFFFF) && (length != 4)))
+	{
+		input->seek(startPosition + 1, librevenge::RVNG_SEEK_SET);
+		return false;
+	}
+
+	input->seek(startPosition + length, librevenge::RVNG_SEEK_SET);
+	return true;
+}
+
 void appendUCS4(librevenge::RVNGString &str, unsigned ucs4)
 {
 	int charLength = libwpd_unichar_to_utf8(ucs4, nullptr);

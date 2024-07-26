@@ -70,6 +70,8 @@ unsigned readU32(librevenge::RVNGInputStream *input, WPXEncryption *encryption, 
 librevenge::RVNGString readPascalString(librevenge::RVNGInputStream *input, WPXEncryption *encryption);
 librevenge::RVNGString readCString(librevenge::RVNGInputStream *input, WPXEncryption *encryption);
 
+bool isValidUtf8(librevenge::RVNGInputStream *input, WPXEncryption *encryption);
+
 void appendUCS4(librevenge::RVNGString &str, unsigned ucs4);
 
 // Various helper structures for the libwpd parser..

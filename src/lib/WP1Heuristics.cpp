@@ -82,6 +82,7 @@ WPDConfidence WP1Heuristics::isWP1FileFormat(librevenge::RVNGInputStream *input,
 		input->seek(6, librevenge::RVNG_SEEK_SET);
 
 	int functionGroupCount = 0;
+	bool invalidUTF8 = false;
 
 	WPD_DEBUG_MSG(("WP1Heuristics::isWP1FileFormat()\n"));
 
@@ -112,6 +113,18 @@ WPDConfidence WP1Heuristics::isWP1FileFormat(librevenge::RVNGInputStream *input,
 		else
 		{
 			// multi character function group
+
+			if (!invalidUTF8 && isValidUtf8(input, encryption.get()))
+			{
+				WPD_DEBUG_MSG(("WP1Heuristics validUTF8\n"));
+				continue;
+			}
+			else
+			{
+				WPD_DEBUG_MSG(("WP1Heuristics invalidUTF8\n"));
+				invalidUTF8 = true;
+			}
+
 			// check that the size constrains are valid, and that every group_member
 			// is properly closed at the right place
 
@@ -173,6 +186,8 @@ WPDConfidence WP1Heuristics::isWP1FileFormat(librevenge::RVNGInputStream *input,
 	However, if we didn't encounter a single WP1 function group) we need to be more carefull:
 	this would be the case when passed a plaintext file for example, which libwpd is not
 	supposed to handle. */
+	if (!invalidUTF8)
+		return WPD_CONFIDENCE_NONE;
 	if (!functionGroupCount && !encryption)
 		return WPD_CONFIDENCE_NONE;
 	return WPD_CONFIDENCE_EXCELLENT;
