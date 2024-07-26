@@ -4,6 +4,8 @@ CHANGES:
 - Fix tdf#153034: Three wrong Greek characters in WordPerfect 5 import
   by partially reverting commit
   0bacfbb3e035174308cb7dd87acfca320dda3912 from 2010
+- Fix tdf#162186: WPDocument::isFileFormatSupported returns
+  WPD_CONFIDENCE_EXCELLENT for an HTML with éééé
 
 0.10.2 - 0.10.3
 - Drop outdated MSVC project files.
