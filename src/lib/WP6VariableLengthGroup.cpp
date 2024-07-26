@@ -163,7 +163,7 @@ void WP6VariableLengthGroup::_read(librevenge::RVNGInputStream *input, WPXEncryp
 	m_sizeDeletable = (unsigned short)(startPosition + m_size - 4 - input->tell());
 	input->seek(tmpPosition, librevenge::RVNG_SEEK_SET);
 
-	WPD_DEBUG_MSG(("WordPerfect: Read variable group header (start_position: %li, sub_group: %i, size: %i, flags: %i, num_prefix_ids: %u, size_non_deletable: %i, size_deletable: %i)\n", startPosition, m_subGroup, m_size, m_flags, unsigned(m_prefixIDs), m_sizeNonDeletable, m_sizeDeletable));
+	WPD_DEBUG_MSG(("WordPerfect: Read variable group header (start_position: %li, sub_group: %i, size: %i, flags: %i, num_prefix_ids: %u, size_non_deletable: %i, size_deletable: %i)\n", startPosition, m_subGroup, m_size, m_flags, unsigned(m_prefixIDs.size()), m_sizeNonDeletable, m_sizeDeletable));
 
 	_readContents(input, encryption);
 
