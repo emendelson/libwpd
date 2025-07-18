@@ -228,7 +228,7 @@ const unsigned tibetan_1_250[] = { 0x0F7C, 0x0F7E, 0 };
 const unsigned tibetan_1_251[] = { 0x0F7D, 0x0F7E, 0 };
 const unsigned tibetan_1_252[] = { 0x0F84, 0 };
 
-const unsigned *tibetanMap1[] =
+const unsigned* const tibetanMap1[] =
 {
 	nullptr,
 	nullptr,
