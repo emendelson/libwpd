@@ -29,7 +29,7 @@
 
 // size of the function groups 0xC0 to 0xFE
 // -1 means the size is variable
-int WP1_FUNCTION_GROUP_SIZE[63] =
+const int WP1_FUNCTION_GROUP_SIZE[63] =
 {
 	10,	//0xC0
 	4,

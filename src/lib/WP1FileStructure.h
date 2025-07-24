@@ -29,7 +29,7 @@
 #define WP1FILESTRUCTURE_H
 
 // size of the functiongroups 0xC0 to 0xF8
-extern int WP1_FUNCTION_GROUP_SIZE[63];
+extern const int WP1_FUNCTION_GROUP_SIZE[63];
 
 #define WP1_ATTRIBUTE_BOLD 0
 #define WP1_ATTRIBUTE_ITALICS 1

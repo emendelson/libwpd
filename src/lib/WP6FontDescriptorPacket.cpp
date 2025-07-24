@@ -29,7 +29,7 @@
 #include "libwpd_internal.h"
 #include <string>
 
-const char *FONT_WEIGHT_STRINGS [] = {	"Bold", "bold", "Demi", "demi", "Extended", "extended",
+const char* const FONT_WEIGHT_STRINGS [] = { "Bold", "bold", "Demi", "demi", "Extended", "extended",
                                         "Extra", "extra", "Headline", "headline", "Light", "light",
                                         "Medium", "medium", "Normal", "normal", "Regular", "regular",
                                         "Standaard", "standaard", "Standard", "standard"
@@ -118,7 +118,7 @@ void WP6FontDescriptorPacket::_readFontName(librevenge::RVNGInputStream *input, 
 		WPD_DEBUG_MSG(("WordPerfect: stripping font name (original: %s)\n", m_fontName.cstr()));
 		std::string stringValue(m_fontName.cstr());
 		std::string::size_type pos;
-		for (auto &k : FONT_WEIGHT_STRINGS)
+		for (const auto &k : FONT_WEIGHT_STRINGS)
 		{
 			if (!stringValue.empty())
 				while ((pos = stringValue.find(k)) != std::string::npos)
