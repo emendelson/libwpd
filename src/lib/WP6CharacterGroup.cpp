@@ -31,6 +31,7 @@
 #include "libwpd_internal.h"
 #include "WP6CommentAnnotationPacket.h"
 #include "WP6FontDescriptorPacket.h"
+#include "WP6CrossReferenceTargetPacket.h"
 
 /*************************************************************************
  * WP6CharacterGroup_SetAlignmentCharacterSubGroup
@@ -271,6 +272,30 @@ void WP6CharacterGroup_CommentSubGroup::parse(WP6Listener *listener, const unsig
 }
 
 /*************************************************************************
+ * WP6CharacterGroup_CrossReferenceTagSubGroup
+ *************************************************************************/
+
+WP6CharacterGroup_CrossReferenceTagSubGroup::WP6CharacterGroup_CrossReferenceTagSubGroup(librevenge::RVNGInputStream * /* input */, WPXEncryption * /* encryption */)
+{
+}
+
+void WP6CharacterGroup_CrossReferenceTagSubGroup::parse(WP6Listener *listener, const unsigned char numPrefixIDs,
+                                                        unsigned short const *prefixIDs) const
+{
+	// A Cross-Reference Tag marks a target position. Its prefix ID points at the
+	// Cross-Reference Target packet (type 0x0F) holding the target's name; emit a
+	// reference mark carrying that name so a reference to it can resolve.
+	for (unsigned char i=0; i<numPrefixIDs; i++)
+	{
+		if (const auto *targetPacket = dynamic_cast<const WP6CrossReferenceTargetPacket *>(listener->getPrefixDataPacket(prefixIDs[i])))
+		{
+			listener->crossReferenceTag(targetPacket->getName());
+			break;
+		}
+	}
+}
+
+/*************************************************************************
  * WP6CharacterGroup
  *************************************************************************/
 
@@ -324,6 +349,9 @@ void WP6CharacterGroup::_readContents(librevenge::RVNGInputStream *input, WPXEnc
 	case WP6_CHARACTER_GROUP_COMMENT:
 		m_subGroupData.reset(new WP6CharacterGroup_CommentSubGroup(input, encryption));
 		break;
+	case WP6_CHARACTER_GROUP_CROSS_REFERENCE_TAG:
+		m_subGroupData.reset(new WP6CharacterGroup_CrossReferenceTagSubGroup(input, encryption));
+		break;
 	default:
 		break;
 	}
@@ -343,6 +371,7 @@ void WP6CharacterGroup::parse(WP6Listener *listener)
 	case WP6_CHARACTER_GROUP_SET_DOT_LEADER_CHARACTERS:
 	case WP6_CHARACTER_GROUP_PARAGRAPH_NUMBER_ON:
 	case WP6_CHARACTER_GROUP_COMMENT:
+	case WP6_CHARACTER_GROUP_CROSS_REFERENCE_TAG:
 		m_subGroupData->parse(listener, getNumPrefixIDs(), getPrefixIDs());
 		break;
 	case WP6_CHARACTER_GROUP_PARAGRAPH_NUMBER_OFF:

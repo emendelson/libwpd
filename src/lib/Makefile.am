@@ -142,6 +142,8 @@ libwpd_@WPD_MAJOR_VERSION@_@WPD_MINOR_VERSION@_la_SOURCES = \
 	WP6ColumnGroup.cpp \
 	WP6CommentAnnotationPacket.cpp \
 	WP6ContentListener.cpp \
+	WP6CrossReferenceGroup.cpp \
+	WP6CrossReferenceTargetPacket.cpp \
 	WP6DefaultInitialFontPacket.cpp \
 	WP6DisplayNumberReferenceGroup.cpp \
 	WP6EOLGroup.cpp \
@@ -313,6 +315,8 @@ libwpd_@WPD_MAJOR_VERSION@_@WPD_MINOR_VERSION@_la_SOURCES = \
 	WP6ColumnGroup.h \
 	WP6CommentAnnotationPacket.h \
 	WP6ContentListener.h \
+	WP6CrossReferenceGroup.h \
+	WP6CrossReferenceTargetPacket.h \
 	WP6DefaultInitialFontPacket.h \
 	WP6DisplayNumberReferenceGroup.h \
 	WP6EOLGroup.h \

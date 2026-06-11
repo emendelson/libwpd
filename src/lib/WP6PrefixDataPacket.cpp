@@ -40,6 +40,7 @@
 #include "WP6GraphicsFilenamePacket.h"
 #include "WP6GraphicsCachedFileDataPacket.h"
 #include "WP6HyperlinkPacket.h"
+#include "WP6CrossReferenceTargetPacket.h"
 #include "libwpd_internal.h"
 
 WP6PrefixDataPacket::WP6PrefixDataPacket(librevenge::RVNGInputStream * /* input */, WPXEncryption * /* encryption */) :
@@ -62,6 +63,9 @@ std::shared_ptr<WP6PrefixDataPacket> WP6PrefixDataPacket::constructPrefixDataPac
 		case WP6_INDEX_HEADER_GENERAL_WORDPERFECT_TEXT:
 			return std::make_shared<WP6GeneralTextPacket>(input, encryption, prefixIndice.getID(),
 			                                              prefixIndice.getDataOffset(), prefixIndice.getDataSize());
+		case WP6_INDEX_HEADER_CROSS_REFERENCE_TARGET:
+			return std::make_shared<WP6CrossReferenceTargetPacket>(input, encryption, prefixIndice.getID(),
+			                                                       prefixIndice.getDataOffset(), prefixIndice.getDataSize());
 		case WP6_INDEX_HEADER_DESIRED_FONT_DESCRIPTOR_POOL:
 			return std::make_shared<WP6FontDescriptorPacket>(input, encryption, prefixIndice.getID(),
 			                                                 prefixIndice.getDataOffset(), prefixIndice.getDataSize());
