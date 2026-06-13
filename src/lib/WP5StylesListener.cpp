@@ -240,6 +240,19 @@ void WP5StylesListener::headerFooterGroup(unsigned char headerFooterType, unsign
 }
 
 
+void WP5StylesListener::pageNumberingChange(const WPXPageNumberPosition pageNumberPosition)
+{
+	if (!isUndoOn())
+	{
+		WPD_DEBUG_MSG(("WordPerfect: pageNumberingChange (position: %u)\n", (unsigned)pageNumberPosition));
+		m_currentPage.setPageNumberPosition(pageNumberPosition);
+		// The page number is rendered in a synthesized header/footer; give it a
+		// font so the generator emits a valid span (WP5's default is Times 12).
+		m_currentPage.setPageNumberingFontName(librevenge::RVNGString("Times New Roman"));
+		m_currentPage.setPageNumberingFontSize(12.0);
+	}
+}
+
 void WP5StylesListener::suppressPageCharacteristics(unsigned char suppressCode)
 {
 	if (!isUndoOn())

@@ -87,6 +87,7 @@ public:
 	void insertNote(WPXNoteType /* noteType */, const WP5SubDocument * /* subDocument */) override {}
 	void headerFooterGroup(unsigned char headerFooterType, unsigned char occurrenceBits, const std::shared_ptr<WP5SubDocument> &subDocument) override;
 	void suppressPageCharacteristics(unsigned char suppressCode) override;
+	void pageNumberingChange(const WPXPageNumberPosition pageNumberPosition) override;
 
 	void boxOn(unsigned char /* positionAndType */, unsigned char /* alignment */, unsigned short /* width */, unsigned short /* height */, unsigned short /* x */, unsigned short /* y */) override {}
 	void boxOff() override {}

@@ -77,6 +77,7 @@ public:
 	virtual void insertNote(WPXNoteType noteType, const WP5SubDocument *subDocument) = 0;
 	virtual void headerFooterGroup(unsigned char headerFooterType, unsigned char occurrenceBits, const std::shared_ptr<WP5SubDocument> &subDocument) = 0;
 	virtual void suppressPageCharacteristics(unsigned char suppressCode) = 0;
+	virtual void pageNumberingChange(const WPXPageNumberPosition pageNumberPosition) = 0;
 
 	virtual void boxOn(unsigned char positionAndType, unsigned char alignment, unsigned short width, unsigned short height, unsigned short x, unsigned short y) = 0;
 	virtual void boxOff() = 0;
