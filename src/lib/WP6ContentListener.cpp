@@ -134,6 +134,11 @@ WP6ContentParsingState::WP6ContentParsingState(WPXTableList tableList, unsigned 
 	m_noteTextPID(0),
 	m_numNestedNotes(0),
 
+	m_isInCrossReference(false),
+	m_crossReferenceSubGroup(0),
+	m_crossReferenceTargetName(),
+	m_crossReferenceDisplayText(),
+
 	m_isFrameOpened(false),
 
 	m_isLinkOpened(false),
@@ -415,6 +420,15 @@ void WP6ContentListener::insertCharacter(unsigned character)
 	if (!isUndoOn())
 	{
 		unsigned tmpCharacter = _mapNonUnicodeCharacter(character);
+
+		// Inside a cross-reference, the character is part of the cached display
+		// value (e.g. the page number); buffer it for the reference field rather
+		// than inserting it as document text.
+		if (m_parseState->m_isInCrossReference)
+		{
+			appendUCS4(m_parseState->m_crossReferenceDisplayText, tmpCharacter);
+			return;
+		}
 
 		if (m_parseState->m_styleStateSequence.getCurrentState() == STYLE_BODY ||
 		        m_parseState->m_styleStateSequence.getCurrentState() == NORMAL)
@@ -1119,6 +1133,76 @@ void WP6ContentListener::displayNumberReferenceGroupOff(const unsigned char subG
 		default:
 			break;
 		}
+	}
+}
+
+void WP6ContentListener::crossReferenceOn(const unsigned char subGroup, const librevenge::RVNGString &targetName)
+{
+	if (!isUndoOn())
+	{
+		// Begin capturing the reference's cached display value; the actual field is
+		// emitted on the matching Off code (see crossReferenceOff/insertCharacter).
+		m_parseState->m_isInCrossReference = true;
+		m_parseState->m_crossReferenceSubGroup = subGroup;
+		m_parseState->m_crossReferenceTargetName = targetName;
+		m_parseState->m_crossReferenceDisplayText.clear();
+	}
+}
+
+void WP6ContentListener::crossReferenceOff(const unsigned char /* subGroup */)
+{
+	if (!isUndoOn() && m_parseState->m_isInCrossReference)
+	{
+		m_parseState->m_isInCrossReference = false;
+		_flushText();
+		_openSpan();
+
+		// Map the WordPerfect reference kind to an ODF reference-format.
+		const char *format = "page";
+		switch (m_parseState->m_crossReferenceSubGroup)
+		{
+		case WP6_CROSS_REFERENCE_GROUP_PAGE_NUMBER_ON:
+		case WP6_CROSS_REFERENCE_GROUP_SECONDARY_PAGE_NUMBER_ON:
+			format = "page";
+			break;
+		case WP6_CROSS_REFERENCE_GROUP_CHAPTER_NUMBER_ON:
+		case WP6_CROSS_REFERENCE_GROUP_VOLUME_NUMBER_ON:
+			format = "chapter";
+			break;
+		case WP6_CROSS_REFERENCE_GROUP_PARAGRAPH_NUMBER_ON:
+			format = "number";
+			break;
+		case WP6_CROSS_REFERENCE_GROUP_FOOTNOTE_NUMBER_ON:
+		case WP6_CROSS_REFERENCE_GROUP_ENDNOTE_NUMBER_ON:
+			format = "text";
+			break;
+		default:
+			break;
+		}
+
+		librevenge::RVNGPropertyList propList;
+		propList.insert("librevenge:field-type", "text:reference-ref");
+		propList.insert("text:reference-format", format);
+		propList.insert("text:ref-name", m_parseState->m_crossReferenceTargetName);
+		if (!m_parseState->m_crossReferenceDisplayText.empty())
+			propList.insert("librevenge:field-content", m_parseState->m_crossReferenceDisplayText);
+		m_documentInterface->insertField(propList);
+
+		m_parseState->m_crossReferenceDisplayText.clear();
+		m_parseState->m_crossReferenceTargetName.clear();
+	}
+}
+
+void WP6ContentListener::crossReferenceTag(const librevenge::RVNGString &targetName)
+{
+	if (!isUndoOn() && !targetName.empty())
+	{
+		_flushText();
+		_openSpan();
+		librevenge::RVNGPropertyList propList;
+		propList.insert("librevenge:field-type", "text:reference-mark");
+		propList.insert("text:name", targetName);
+		m_documentInterface->insertField(propList);
 	}
 }
 

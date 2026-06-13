@@ -102,6 +102,12 @@ public:
 	{
 		if (!isUndoOn()) m_currentPageHasContent = true;
 	}
+	void crossReferenceOn(const unsigned char /* subGroup */, const librevenge::RVNGString & /* targetName */) override
+	{
+		if (!isUndoOn()) m_currentPageHasContent = true;
+	}
+	void crossReferenceOff(const unsigned char /* subGroup */) override {}
+	void crossReferenceTag(const librevenge::RVNGString & /* targetName */) override {}
 	void styleGroupOn(const unsigned char /* subGroup */) override {}
 	void styleGroupOff(const unsigned char /* subGroup */) override {}
 	void globalOn(const unsigned char /* systemStyle */) override {}

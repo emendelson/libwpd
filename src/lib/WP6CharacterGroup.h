@@ -168,6 +168,16 @@ private:
 
 };
 
+class WP6CharacterGroup_CrossReferenceTagSubGroup : public WP6VariableLengthGroup_SubGroup
+{
+public:
+	WP6CharacterGroup_CrossReferenceTagSubGroup(librevenge::RVNGInputStream *input, WPXEncryption *encryption);
+	void parse(WP6Listener *listener, const unsigned char numPrefixIDs, unsigned short const *prefixIDs) const override;
+
+private:
+
+};
+
 class WP6CharacterGroup : public WP6VariableLengthGroup
 {
 public:

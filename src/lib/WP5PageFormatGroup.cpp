@@ -42,6 +42,7 @@ WP5PageFormatGroup::WP5PageFormatGroup(librevenge::RVNGInputStream *input, WPXEn
 	m_bottomMargin(0),
 	m_justification(0),
 	m_suppressCode(0),
+	m_pageNumberPosition(0),
 	m_formLength(0),
 	m_formWidth(0),
 	m_formOrientation(PORTRAIT)
@@ -188,6 +189,13 @@ void WP5PageFormatGroup::_readContents(librevenge::RVNGInputStream *input, WPXEn
 		input->seek(1, librevenge::RVNG_SEEK_CUR);
 		m_suppressCode = readU8(input, encryption);
 		break;
+	case WP5_TOP_PAGE_FORMAT_GROUP_PAGE_NUMBER_POSITION:
+		// skip old position (1 byte) + old font height (1 word), then read the
+		// new position code (0=none,1..4=top L/C/R/alt, 5..8=bottom L/C/R/alt)
+		input->seek(3, librevenge::RVNG_SEEK_CUR);
+		m_pageNumberPosition = readU8(input, encryption);
+		WPD_DEBUG_MSG(("WordPerfect: Page format group page number position (0x%2x)\n", m_pageNumberPosition));
+		break;
 	case WP5_TOP_PAGE_FORMAT_GROUP_FORM:
 		unsigned char tmpOrientation;
 		// skip to the new DESIRED values (99 - 4)
@@ -244,6 +252,9 @@ void WP5PageFormatGroup::parse(WP5Listener *listener)
 		break;
 	case WP5_TOP_PAGE_FORMAT_GROUP_SUPPRESS_PAGE_CHARACTERISTICS:
 		listener->suppressPageCharacteristics(m_suppressCode);
+		break;
+	case WP5_TOP_PAGE_FORMAT_GROUP_PAGE_NUMBER_POSITION:
+		listener->pageNumberingChange((WPXPageNumberPosition)m_pageNumberPosition);
 		break;
 	case WP5_TOP_PAGE_FORMAT_GROUP_FORM:
 		listener->pageFormChange(m_formLength, m_formWidth, m_formOrientation);

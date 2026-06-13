@@ -34,6 +34,7 @@
 #include "WP6FootnoteEndnoteGroup.h"
 #include "WP6HeaderFooterGroup.h"
 #include "WP6DisplayNumberReferenceGroup.h"
+#include "WP6CrossReferenceGroup.h"
 #include "WP6StyleGroup.h"
 #include "WP6TabGroup.h"
 #include "WP6BoxGroup.h"
@@ -82,6 +83,8 @@ WP6VariableLengthGroup *WP6VariableLengthGroup::constructVariableLengthGroup(lib
 		return new WP6HeaderFooterGroup(input, encryption);
 	case WP6_TOP_DISPLAY_NUMBER_REFERENCE_GROUP:
 		return new WP6DisplayNumberReferenceGroup(input, encryption);
+	case WP6_TOP_CROSSREFERENCE_GROUP:
+		return new WP6CrossReferenceGroup(input, encryption);
 	case WP6_TOP_STYLE_GROUP:
 		return new WP6StyleGroup(input, encryption);
 	case WP6_TOP_TAB_GROUP:

@@ -81,6 +81,9 @@ public:
 	virtual void paragraphNumberOff() = 0;
 	virtual void displayNumberReferenceGroupOn(const unsigned char subGroup, const unsigned char level) = 0;
 	virtual void displayNumberReferenceGroupOff(const unsigned char subGroup) = 0;
+	virtual void crossReferenceOn(const unsigned char subGroup, const librevenge::RVNGString &targetName) = 0;
+	virtual void crossReferenceOff(const unsigned char subGroup) = 0;
+	virtual void crossReferenceTag(const librevenge::RVNGString &targetName) = 0;
 	virtual void styleGroupOn(const unsigned char subGroup) = 0;
 	virtual void styleGroupOff(const unsigned char subGroup) = 0;
 	virtual void globalOn(const unsigned char systemStyle) = 0;

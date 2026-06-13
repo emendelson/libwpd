@@ -108,6 +108,7 @@ public:
 	void insertNote(WPXNoteType noteType, const WP5SubDocument *subDocument) override;
 	void headerFooterGroup(unsigned char headerFooterType, unsigned char occurrenceBits, const std::shared_ptr<WP5SubDocument> &subDocument) override;
 	void suppressPageCharacteristics(unsigned char /* suppressCode */) override {}
+	void pageNumberingChange(const WPXPageNumberPosition /* pageNumberPosition */) override {}
 
 	void setDefaultFont(const librevenge::RVNGString &fontName, double fontSize);
 

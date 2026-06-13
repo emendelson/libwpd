@@ -115,6 +115,15 @@ struct WP6ContentParsingState
 	unsigned m_noteTextPID;
 	unsigned m_numNestedNotes;
 
+	// Cross-reference capture: while a Cross-Reference group is "On" the document
+	// text between the On and Off codes is the reference's cached display value
+	// (e.g. the page number). We buffer it here instead of emitting it, then emit
+	// the whole reference field when the Off code arrives.
+	bool m_isInCrossReference;
+	unsigned char m_crossReferenceSubGroup;
+	librevenge::RVNGString m_crossReferenceTargetName;
+	librevenge::RVNGString m_crossReferenceDisplayText;
+
 	bool m_isFrameOpened;
 
 	bool m_isLinkOpened;
@@ -218,6 +227,9 @@ public:
 	void paragraphNumberOff() override;
 	void displayNumberReferenceGroupOn(const unsigned char subGroup, const unsigned char level) override;
 	void displayNumberReferenceGroupOff(const unsigned char subGroup) override;
+	void crossReferenceOn(const unsigned char subGroup, const librevenge::RVNGString &targetName) override;
+	void crossReferenceOff(const unsigned char subGroup) override;
+	void crossReferenceTag(const librevenge::RVNGString &targetName) override;
 	void styleGroupOn(const unsigned char subGroup) override;
 	void styleGroupOff(const unsigned char subGroup) override;
 	void globalOn(const unsigned char systemStyle) override;
