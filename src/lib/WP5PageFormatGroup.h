@@ -55,6 +55,8 @@ private:
 	unsigned char m_justification;
 	// variable needed for subgroup 7 (Suppress Page Characteristics)
 	unsigned char m_suppressCode;
+	// variable needed for subgroup 8 (Page Number Position)
+	unsigned char m_pageNumberPosition;
 	// variables needed for subgroup 11 (Form)
 	unsigned short m_formLength;
 	unsigned short m_formWidth;
