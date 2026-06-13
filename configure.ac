@@ -1,6 +1,6 @@
 # Process this file with autoconf to create configure.
 
-AC_PREREQ([2.65])
+AC_PREREQ([2.72])
 
 # ====================
 # Version informations
@@ -15,7 +15,7 @@ m4_define([libwpd_version],[libwpd_version_major.libwpd_version_minor.libwpd_ver
 # =============
 AC_INIT([libwpd],[libwpd_version])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11 foreign dist-xz dist-bzip2])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_LANG([C++])
@@ -92,7 +92,7 @@ AS_IF([test "x$platform_win32" = "xyes"],
         AC_MSG_CHECKING([for -fvisibility=hidden compiler flag])
         saved_CXXFLAGS="$CXXFLAGS"
         CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
-        AC_TRY_COMPILE([], [], [have_visibility=yes], [have_visibility=no])
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[have_visibility=yes],[have_visibility=no])
         AC_MSG_RESULT([$have_visibility])
         CXXFLAGS="$saved_CXXFLAGS"
         AX_GCC_FUNC_ATTRIBUTE([visibility])
