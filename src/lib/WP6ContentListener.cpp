@@ -1919,6 +1919,17 @@ void WP6ContentListener::_flushText()
 		m_parseState->m_numListExtraTabs = 0;
 	}
 
+	// If there is buffered number/label text (or its tabs) to emit but neither a
+	// paragraph nor a list element is open, open one first. Otherwise the number
+	// label and its tab are written straight into the body, outside any <text:p> —
+	// which is invalid ODF that Microsoft Word refuses (LibreOffice tolerates it).
+	if (!m_ps->m_isParagraphOpened && !m_ps->m_isListElementOpened
+	        && (m_parseState->m_textBeforeNumber.len() || m_parseState->m_textBeforeDisplayReference.len()
+	            || m_parseState->m_numberText.len() || m_parseState->m_textAfterDisplayReference.len()
+	            || m_parseState->m_textAfterNumber.len() || m_parseState->m_numListExtraTabs > 0
+	            || m_parseState->m_bodyText.len()))
+		_openSpan();
+
 	if (m_parseState->m_textBeforeNumber.len())
 	{
 		_insertText(m_parseState->m_textBeforeNumber);
