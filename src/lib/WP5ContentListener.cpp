@@ -521,6 +521,75 @@ void WP5ContentListener::insertNoteReference(const librevenge::RVNGString &noteR
 	}
 }
 
+void WP5ContentListener::crossReferenceTarget(const librevenge::RVNGString &tagName)
+{
+	// The target of an auto reference (0xD7 sub 0x08): emit a reference mark so a
+	// reference-ref elsewhere can resolve to it (mirrors the WP6 crossReferenceTag).
+	if (!isUndoOn() && !tagName.empty())
+	{
+		_flushText();
+		_openSpan();
+		librevenge::RVNGPropertyList propList;
+		propList.insert("librevenge:field-type", "text:reference-mark");
+		propList.insert("text:name", tagName);
+		m_documentInterface->insertField(propList);
+	}
+}
+
+void WP5ContentListener::crossReferenceReference(unsigned char referenceType, const librevenge::RVNGString &tagName, const librevenge::RVNGString &displayText)
+{
+	if (isUndoOn())
+		return;
+	// A "page number" reference (type 0) has a true live ODF equivalent: a
+	// text:reference-ref to the named mark, formatted as the mark's page. LibreOffice
+	// resolves and updates it (F9 / on repagination).
+	//
+	// Footnote/endnote references (types 2/3) become live text:note-ref fields (see
+	// below) since the note carries a derivable ODT id. The remaining types
+	// (paragraph, figure/table/box numbers) have no live source here: the target is a
+	// bare reference mark, so LibreOffice would recompute a "number"/"text" reference
+	// to an EMPTY value (blank gray field). Until live paragraph numbering / box
+	// export exist, we emit their cached number as ordinary text (correct, not live).
+	if (referenceType == 0x00 && !tagName.empty())
+	{
+		_flushText();
+		_openSpan();
+		librevenge::RVNGPropertyList propList;
+		propList.insert("librevenge:field-type", "text:reference-ref");
+		propList.insert("text:reference-format", "page");
+		propList.insert("text:ref-name", tagName);
+		if (!displayText.empty())
+			propList.insert("librevenge:field-content", displayText);
+		m_documentInterface->insertField(propList);
+	}
+	else if ((referenceType == 0x02 || referenceType == 0x03) && !displayText.empty())
+	{
+		// Footnote (2) / endnote (3): emit a live note reference. libodfgen ids notes
+		// "ftn"+number (footnotes) / "edn"+number (endnotes), and this reference's
+		// cached display value IS that number, so we point a text:note-ref straight at
+		// the note — no need to track the target tag through the note subdocument.
+		_flushText();
+		_openSpan();
+		librevenge::RVNGString refName(referenceType == 0x02 ? "ftn" : "edn");
+		refName.append(displayText);
+		librevenge::RVNGPropertyList propList;
+		propList.insert("librevenge:field-type", "text:note-ref");
+		propList.insert("text:note-class", referenceType == 0x02 ? "footnote" : "endnote");
+		propList.insert("text:reference-format", "text");
+		propList.insert("text:ref-name", refName);
+		propList.insert("librevenge:field-content", displayText);
+		m_documentInterface->insertField(propList);
+	}
+	else
+	{
+		// paragraph / figure / table / box numbers: no live ODF source available yet,
+		// so emit the cached number as ordinary text (correct value, just not live).
+		const char *number = displayText.cstr();
+		for (int i = 0; number && number[i]; i++)
+			insertCharacter((unsigned char)number[i]);
+	}
+}
+
 void WP5ContentListener::insertNote(WPXNoteType noteType, const WP5SubDocument *subDocument)
 {
 	if (!isUndoOn())
